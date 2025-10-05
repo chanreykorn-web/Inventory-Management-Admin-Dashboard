@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -18,17 +19,27 @@ class AuthController extends Controller
     // Handle email/password login
     public function handleSignIn(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
-            return redirect('/');
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        if (Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'message' => 'Login successful!',
+                'redirect' => url('/') // 👈 you can change redirect URL
+            ]);
         }
-        return back()->withErrors(['msg' => 'Invalid credentials.']);
+
+        return response()->json([
+            'error' => 'Invalid email or password.'
+        ], 401);
     }
 
     // Show forgot password form
     public function showForgotPassword()
     {
-        return view('auth.forgot_password');
+        return view('auth.ForgetPassword');
     }
 
     // Handle forgot password request, send 6-digit code
@@ -134,5 +145,36 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return redirect('/signin')->withErrors(['msg' => 'Facebook sign in failed.']);
         }
+    }
+
+    public function signUp()
+    {
+        return view('auth.Signup');
+    }
+
+    public function handleSignUp(Request $request)
+    {
+        // ✅ Validate incoming request
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        // ✅ Create new user
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+        ]);
+
+        // ✅ Optionally, auto-login the user after signup
+        // Auth::login($user);
+
+        // ✅ Return success response
+        return response()->json([
+            'message' => 'User registered successfully!',
+            'user' => $user
+        ], 201);
     }
 }

@@ -19,7 +19,7 @@ Route::get('/auth/google', [App\Http\Controllers\AuthController::class, 'redirec
 Route::get('/auth/google/callback', [App\Http\Controllers\AuthController::class, 'handleGoogleCallback']);
 // Other routes...
 Route::get('/signup', [App\Http\Controllers\AuthController::class, 'signUp'])->name('signup');
-// Route::post('/signin', [App\Http\Controllers\AuthController::class,
+Route::post('/signup', [App\Http\Controllers\AuthController::class, 'handleSignUp'])->name('signup.post');
 // Facebook OAuth Routes
 Route::get('/auth/facebook', [App\Http\Controllers\AuthController::class, 'redirectToFacebook'])->name('auth.facebook');
 Route::get('/auth/facebook/callback', [App\Http\Controllers\AuthController::class, 'handleFacebookCallback']);
