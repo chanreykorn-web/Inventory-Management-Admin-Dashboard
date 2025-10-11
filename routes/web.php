@@ -23,3 +23,9 @@ Route::post('/signup', [App\Http\Controllers\AuthController::class, 'handleSignU
 // Facebook OAuth Routes
 Route::get('/auth/facebook', [App\Http\Controllers\AuthController::class, 'redirectToFacebook'])->name('auth.facebook');
 Route::get('/auth/facebook/callback', [App\Http\Controllers\AuthController::class, 'handleFacebookCallback']);
+
+// dashboard route /
+Route::get('/', [App\Http\Controllers\DashboardController::class, 'dashboard'])->name('/');
+
+// productlist
+Route::get('/productlist', [App\Http\Controllers\ProductController::class, 'productlist'])->name('productlist');
